@@ -7,6 +7,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <style>
         * { user-select: none; outline: none; }
+        
+        /* Глобальные улучшения скролла */
+        * {
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        html {
+            scrollbar-width: thin;
+            scrollbar-color: #555 #333;
+            overscroll-behavior: none;
+        }
+        
         body {
             font-family: 'Roboto', sans-serif;
             background: linear-gradient(to bottom, #252525, #1e1e1e);
@@ -18,6 +31,7 @@
             align-items: center;
             min-height: 100vh;
             font-size: 14px;
+            overscroll-behavior: none;
         }
         .app-container {
             background-color: #333;
@@ -76,9 +90,18 @@
             scrollbar-width: thin;
             scrollbar-color: #555 #333;
             -webkit-overflow-scrolling: touch;
+            /* Улучшаем скролл для контента */
+            scroll-behavior: smooth;
+            scroll-padding: 10px;
+            overscroll-behavior: contain;
         }
         .app-content::-webkit-scrollbar { width: 6px; }
-        .app-content::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
+        .app-content::-webkit-scrollbar-thumb { 
+            background: #555; 
+            border-radius: 3px; 
+            /* Улучшаем видимость скроллбара */
+            min-height: 40px;
+        }
         .app-content::-webkit-scrollbar-track { background: #333; }
         .app-section {
             display: none;
@@ -179,6 +202,13 @@
             display: none;
             box-sizing: border-box;
             margin-top: 10px;
+            scrollbar-width: thin;
+            scrollbar-color: #555 #333;
+            -webkit-overflow-scrolling: touch;
+            /* Применяем улучшенный скролл ко всем скроллируемым контейнерам */
+            scroll-behavior: smooth;
+            scroll-padding: 5px;
+            overscroll-behavior: contain;
         }
         .item-details .item {
             display: block;
@@ -318,6 +348,9 @@
             scrollbar-width: thin;
             scrollbar-color: #555 #383838;
             -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+            scroll-padding: 5px;
+            overscroll-behavior: contain;
         }
         .user-item {
             display: flex;
@@ -846,6 +879,49 @@
         .confirm-no:hover {
             background-color: #757575;
         }
+
+        /* Добавляем эти стили в конец CSS для улучшения скролла */
+        .scroll-container {
+            scrollbar-width: thin;
+            scrollbar-color: #555 #333;
+            -webkit-overflow-scrolling: touch; 
+            scroll-behavior: smooth;
+            scroll-padding: 5px;
+            overscroll-behavior: contain;
+        }
+
+        .scroll-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .scroll-container::-webkit-scrollbar-thumb {
+            background: #666;
+            border-radius: 3px;
+            min-height: 40px;
+        }
+
+        .scroll-container::-webkit-scrollbar-thumb:hover {
+            background: #777;
+        }
+
+        .scroll-container::-webkit-scrollbar-track {
+            background: #333;
+            border-radius: 3px;
+        }
+
+        /* Применяем класс scroll-container ко всем скроллируемым элементам */
+        .app-content,
+        .app-nav,
+        .user-list,
+        .item-details,
+        .modal-panel,
+        .sales-table-container {
+            scrollbar-width: thin;
+            scrollbar-color: #555 #333;
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+            overscroll-behavior: contain;
+        }
     </style>
 </head>
 <body>
@@ -865,7 +941,7 @@
                 <li><a href="#admin">Админ-панель</a></li>
             </ul>
         </nav>
-        <main class="app-content" id="app-content">
+        <main class="app-content scroll-container" id="app-content">
             <section id="profile" class="app-section active">
                 <h2>Кабинет</h2>
                 <p>Уровень подписки: <span class="subscription-info">Нет</span></p>
@@ -903,7 +979,7 @@
                 </div>
                  <div class="search-container">
                      <input type="text" id="search-item" placeholder="Поиск предмета">
-                    <div class="item-details"></div>
+                    <div class="item-details scroll-container"></div>
                  </div>
             </section>
             <section id="tracking" class="app-section">
@@ -949,7 +1025,7 @@
                 <h2>Админ-панель</h2>
                 <div class="admin-block">
                     <h3>Пользователи (<span id="user-count">3</span>)</h3>
-                    <div class="user-list" id="user-list-container">
+                    <div class="user-list scroll-container" id="user-list-container">
                         </div>
                 </div>
                 <div class="admin-block">
@@ -1029,7 +1105,7 @@
                 <div class="modal-tab" data-tab="specs">Стаки</div>
             </div>
             
-            <div class="modal-panel active" id="panel-overview">
+            <div class="modal-panel active scroll-container" id="panel-overview">
                 <div class="price-option">
                     <label class="switch">
                         <input type="checkbox" id="filter-toggle" checked>
@@ -1090,9 +1166,9 @@
                 </div>
             </div>
             
-            <div class="modal-panel" id="panel-history">
+            <div class="modal-panel scroll-container" id="panel-history">
                 <h3 style="margin-top: 5px; margin-bottom: 15px;">Последние 10 продаж (МСК)</h3>
-                <div class="sales-table-container">
+                <div class="sales-table-container scroll-container">
                     <table class="sales-table">
                         <thead>
                             <tr>
@@ -1157,9 +1233,9 @@
                 </div>
             </div>
             
-            <div class="modal-panel" id="panel-analytics">
+            <div class="modal-panel scroll-container" id="panel-analytics">
                 <h3 style="margin-top: 5px; margin-bottom: 15px;">Диапазон цен</h3>
-                <div class="sales-table-container">
+                <div class="sales-table-container scroll-container">
                     <table class="sales-table">
                         <thead>
                             <tr>
@@ -1193,9 +1269,9 @@
                 </div>
             </div>
             
-            <div class="modal-panel" id="panel-specs">
+            <div class="modal-panel scroll-container" id="panel-specs">
                 <h3 style="margin-top: 5px; margin-bottom: 15px;">Размер стака</h3>
-                <div class="sales-table-container">
+                <div class="sales-table-container scroll-container">
                     <table class="sales-table">
                         <thead>
                             <tr>
@@ -1332,90 +1408,26 @@
                 }
             }
             
-            // Enable drag-to-scroll functionality
+            // Полностью заменяем функцию enableDragToScroll на оптимизированную версию
             function enableDragToScroll(element) {
-                let isDown = false;
-                let startX, startY, scrollLeft, scrollTop;
+                // Мы используем только базовые события скролла для комфортной работы на всех устройствах
+                // Вместо перехвата событий и реализации кастомного скролла
                 
-                element.addEventListener('mousedown', (e) => {
-                    // Skip if clicking on a button or interactive element
-                    if (e.target.tagName === 'BUTTON' || e.target.closest('button') || 
-                        e.target.tagName === 'A' || e.target.closest('a') || 
-                        e.target.tagName === 'INPUT' || e.target.closest('input') ||
-                        e.target.tagName === 'LABEL' || e.target.closest('label') ||
-                        e.target.classList.contains('modal-tab') || 
-                        e.target.classList.contains('buy-sell-tab')) {
-                        return;
-                    }
-                    
-                    isDown = true;
-                    element.style.cursor = 'grabbing';
-                    startX = e.pageX - element.offsetLeft;
-                    startY = e.pageY - element.offsetTop;
-                    scrollLeft = element.scrollLeft;
-                    scrollTop = element.scrollTop;
-                });
+                // Проверяем, доступен ли SmoothScroll API
+                if ('scrollBehavior' in document.documentElement.style) {
+                    // Современные браузеры поддерживают плавный скролл через CSS
+                    element.style.scrollBehavior = 'smooth';
+                }
                 
-                element.addEventListener('mouseleave', () => {
-                    isDown = false;
-                    element.style.cursor = 'default';
-                });
+                // Добавляем поддержку инерции скролла для iOS
+                element.style.webkitOverflowScrolling = 'touch';
                 
-                element.addEventListener('mouseup', () => {
-                    isDown = false;
-                    element.style.cursor = 'default';
-                });
-                
-                element.addEventListener('mousemove', (e) => {
-                    if (!isDown) return;
-                    e.preventDefault();
-                    const x = e.pageX - element.offsetLeft;
-                    const y = e.pageY - element.offsetTop;
-                    const walkX = (x - startX) * 1.5; // Adjust scrolling speed
-                    const walkY = (y - startY) * 1.5;
-                    element.scrollLeft = scrollLeft - walkX;
-                    element.scrollTop = scrollTop - walkY;
-                });
-                
-                // Touch events for mobile
-                element.addEventListener('touchstart', (e) => {
-                    // Skip if touching a button or interactive element
-                    if (e.target.tagName === 'BUTTON' || e.target.closest('button') || 
-                        e.target.tagName === 'A' || e.target.closest('a') || 
-                        e.target.tagName === 'INPUT' || e.target.closest('input') ||
-                        e.target.tagName === 'LABEL' || e.target.closest('label') ||
-                        e.target.classList.contains('modal-tab') || 
-                        e.target.classList.contains('buy-sell-tab')) {
-                        return;
-                    }
-                    
-                    isDown = true;
-                    const touch = e.touches[0];
-                    startX = touch.pageX - element.offsetLeft;
-                    startY = touch.pageY - element.offsetTop;
-                    scrollLeft = element.scrollLeft;
-                    scrollTop = element.scrollTop;
-                }, { passive: false });
-                
-                element.addEventListener('touchend', () => {
-                    isDown = false;
-                });
-                
-                element.addEventListener('touchmove', (e) => {
-                    if (!isDown) return;
-                    const touch = e.touches[0];
-                    const x = touch.pageX - element.offsetLeft;
-                    const y = touch.pageY - element.offsetTop;
-                    const walkX = (x - startX) * 1.5;
-                    const walkY = (y - startY) * 1.5;
-                    element.scrollLeft = scrollLeft - walkX;
-                    element.scrollTop = scrollTop - walkY;
-                }, { passive: false });
+                // Предотвращаем растягивание страницы при достижении границы скролла
+                element.style.overscrollBehavior = 'contain';
             }
             
-            // Apply drag-to-scroll to scrollable containers
-            enableDragToScroll(document.getElementById('app-content'));
-            document.querySelectorAll('.modal-panel, .sales-table-container, .item-details, .user-list').forEach(container => {
+            // Apply optimized scroll to scrollable containers
+            document.querySelectorAll('.scroll-container').forEach(container => {
                 enableDragToScroll(container);
             });
             
