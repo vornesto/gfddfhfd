@@ -1709,22 +1709,33 @@
             });
 
             document.addEventListener('click', (e) => {
-                if (!itemDetails.contains(e.target) && e.target !== searchInput) {
+                // Проверяем, был ли клик вне поля поиска и вне результатов поиска,
+                // но только если не было взаимодействия с модальным окном
+                const modal = document.getElementById('item-detail-modal');
+                const isModalVisible = modal.style.display === 'block';
+                
+                if (!itemDetails.contains(e.target) && 
+                    e.target !== searchInput && 
+                    !isModalVisible && 
+                    !modal.contains(e.target)) {
                     itemDetails.style.display = 'none';
                 }
             });
             
             searchInput.addEventListener('blur', () => {
-                setTimeout(() => {
-                    if (!itemDetails.matches(':hover')) {
-                        itemDetails.style.display = 'none';
-                    }
-                }, 150);
+                // Удаляем автоматическое скрытие результатов поиска
+                // setTimeout(() => {
+                //     if (!itemDetails.matches(':hover')) {
+                //         itemDetails.style.display = 'none';
+                //     }
+                // }, 150);
             });
+            
             searchInput.addEventListener('keydown', e => { 
                 if (e.key === 'Enter') {
                     searchInput.blur(); 
-                    itemDetails.style.display = 'none'; 
+                    // Убираем автоматическое скрытие результатов поиска
+                    // itemDetails.style.display = 'none'; 
                 }
             });
 
@@ -2281,15 +2292,13 @@
                 modal.style.display = 'none';
                 document.body.style.overflow = '';
                 
-                // Restore search results if they were visible
+                // Обеспечиваем, чтобы результаты поиска оставались видимыми после закрытия модального окна
                 const searchInput = document.getElementById('search-item');
                 if (searchInput.value.trim() !== '') {
                     const itemDetails = document.querySelector('#filtering .item-details');
                     if (itemDetails) {
                         itemDetails.style.display = 'block';
                     }
-                    // Re-run search to ensure results are shown
-                    filterItems();
                 }
             });
             
@@ -2300,15 +2309,13 @@
                     modal.style.display = 'none';
                     document.body.style.overflow = '';
                     
-                    // Restore search results if they were visible
+                    // Обеспечиваем, чтобы результаты поиска оставались видимыми после закрытия модального окна
                     const searchInput = document.getElementById('search-item');
                     if (searchInput.value.trim() !== '') {
                         const itemDetails = document.querySelector('#filtering .item-details');
                         if (itemDetails) {
                             itemDetails.style.display = 'block';
                         }
-                        // Re-run search to ensure results are shown
-                        filterItems();
                     }
                 }
             });
