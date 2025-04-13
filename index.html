@@ -1115,6 +1115,16 @@
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Fix for touch events in Telegram WebApp
+            document.querySelectorAll('button, .modal-tab, .buy-sell-tab, .tracked-item, .app-nav a').forEach(element => {
+                element.addEventListener('touchstart', function(e) {
+                    // Prevent default touch behavior
+                    e.preventDefault();
+                    // Trigger click event
+                    this.click();
+                }, { passive: false });
+            });
+            
             const navLinks = document.querySelectorAll('.app-nav a');
             const sections = document.querySelectorAll('.app-section');
             const appContent = document.getElementById('app-content');
