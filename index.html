@@ -278,17 +278,19 @@
         #generated-key:hover { background-color: #555; }
         .notification {
             position: fixed;
-            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            padding: 10px 20px;
-            background-color: #27ae60;
-            border-radius: 6px;
+            bottom: 20px;
+            padding: 12px 20px;
+            background-color: #2ecc71;
             color: white;
+            border-radius: 8px;
+            z-index: 1000;
             opacity: 0;
-            transition: opacity 0.3s ease, bottom 0.3s ease;
-            z-index: 100;
-            pointer-events: none;
+            transition: opacity 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 80%;
+            text-align: center;
         }
         .notification.show {
             opacity: 1;
@@ -743,6 +745,107 @@
         .sales-table tr:last-child td {
             border-bottom: none;
         }
+        .compensation-container {
+            padding: 10px 0;
+        }
+        .compensation-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .compensation-controls label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .compensation-controls input {
+            width: 70px;
+            padding: 8px;
+            background-color: #444;
+            border: 1px solid #555;
+            border-radius: 6px;
+            color: #ddd;
+            -moz-appearance: textfield;
+        }
+        .compensation-controls input::-webkit-inner-spin-button,
+        .compensation-controls input::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .compensation-info {
+            margin: 10px 0;
+            padding: 8px;
+            background-color: #444;
+            border-radius: 6px;
+            color: #ddd;
+            text-align: center;
+        }
+        .compensation-actions {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .compensation-actions button {
+            background-color: #3498db;
+            width: auto;
+            padding: 8px 15px;
+        }
+        .compensation-actions button:hover {
+            background-color: #2980b9;
+        }
+        .confirmation-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .confirmation-content {
+            background-color: #333;
+            padding: 25px;
+            border-radius: 8px;
+            width: 85%;
+            max-width: 350px;
+            text-align: center;
+        }
+        .confirmation-message {
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+        .confirmation-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .confirmation-actions button {
+            width: auto;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .confirm-yes {
+            background-color: #f44336;
+            color: white;
+        }
+        .confirm-yes:hover {
+            background-color: #d32f2f;
+        }
+        .confirm-no {
+            background-color: #9e9e9e;
+            color: white;
+        }
+        .confirm-no:hover {
+            background-color: #757575;
+        }
     </style>
 </head>
 <body>
@@ -788,11 +891,14 @@
                     <input type="number" id="discount" placeholder="Скидка (%)">
                     <select id="category">
                         <option value="">Все категории</option>
-                        <option value="suits">Костюмы</option>
                         <option value="weapons">Оружие</option>
-                        <option value="attachments">Обвесы</option>
+                        <option value="armor">Броня и снаряжение</option>
                         <option value="artifacts">Артефакты</option>
-                        <option value="other">Прочее</option>
+                        <option value="ammo">Амуниция и боеприпасы</option>
+                        <option value="meds">Медикаменты</option>
+                        <option value="food">Еда и напитки</option>
+                        <option value="components">Компоненты и материалы</option>
+                        <option value="quest">Квестовые предметы</option>
                     </select>
                 </div>
                  <div class="search-container">
@@ -883,6 +989,28 @@
                         <label>Задержка (сек)<input type="number" id="delay-setting" value="3"></label>
                     </div>
                     <button style="margin-top: 10px" id="apply-settings">Применить</button>
+                </div>
+                
+                <div class="admin-block">
+                    <h3>Массовое изменение срока подписки</h3>
+                    <div class="compensation-container">
+                        <div class="compensation-controls">
+                            <label>
+                                <span>Дней:</span>
+                                <input type="number" id="compensation-days" value="1" min="-365" max="365">
+                            </label>
+                            <label>
+                                <span>Часов:</span>
+                                <input type="number" id="compensation-hours" value="0" min="-24" max="24">
+                            </label>
+                        </div>
+                        <div class="compensation-info" id="compensation-message">
+                            Добавить всем активным пользователям 1 день
+                        </div>
+                        <div class="compensation-actions">
+                            <button id="compensation-button">Изменить срок</button>
+                        </div>
+                    </div>
                 </div>
             </section>
         </main>
@@ -980,47 +1108,47 @@
                                 <td>640 000 ₽</td>
                             </tr>
                             <tr>
-                                <td>13.04.2025 15:16</td>
+                                <td>13.04.2025 15:15</td>
                                 <td>1</td>
                                 <td>75 000 ₽</td>
                             </tr>
                             <tr>
-                                <td>13.04.2025 15:16</td>
+                                <td>13.04.2025 15:14</td>
                                 <td>1</td>
                                 <td>75 000 ₽</td>
                             </tr>
                             <tr>
-                                <td>13.04.2025 15:16</td>
+                                <td>13.04.2025 15:13</td>
                                 <td>1</td>
                                 <td>75 000 ₽</td>
                             </tr>
                             <tr>
-                                <td>13.04.2025 15:16</td>
+                                <td>13.04.2025 15:12</td>
                                 <td>10</td>
                                 <td>798 000 ₽</td>
                             </tr>
                             <tr>
-                                <td>13.04.2025 15:16</td>
+                                <td>13.04.2025 15:11</td>
                                 <td>1</td>
                                 <td>77 000 ₽</td>
                             </tr>
                             <tr>
-                                <td>13.04.2025 15:15</td>
+                                <td>13.04.2025 15:10</td>
                                 <td>1</td>
                                 <td>77 000 ₽</td>
                             </tr>
                             <tr>
-                                <td>13.04.2025 15:15</td>
+                                <td>13.04.2025 15:09</td>
                                 <td>11</td>
                                 <td>820 000 ₽</td>
                             </tr>
                             <tr>
-                                <td>13.04.2025 15:15</td>
+                                <td>13.04.2025 15:08</td>
                                 <td>1</td>
                                 <td>75 000 ₽</td>
                             </tr>
                             <tr>
-                                <td>13.04.2025 15:15</td>
+                                <td>13.04.2025 15:07</td>
                                 <td>10</td>
                                 <td>778 000 ₽</td>
                             </tr>
@@ -1113,6 +1241,15 @@
             </div>
         </div>
     </div>
+    <div class="confirmation-modal" id="confirmation-modal" style="display: none;">
+        <div class="confirmation-content">
+            <div class="confirmation-message"></div>
+            <div class="confirmation-actions">
+                <button class="confirm-yes">Подтвердить</button>
+                <button class="confirm-no">Отмена</button>
+            </div>
+        </div>
+    </div>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // Fix for touch events in Telegram WebApp
@@ -1135,6 +1272,153 @@
             const maxPriceInput = document.getElementById('max-price');
             const discountInput = document.getElementById('discount');
             const categorySelect = document.getElementById('category');
+            
+            // Declare filterItems function early so it can be accessed by other functions
+            function filterItems() {
+                const searchTerm = searchInput.value.toLowerCase();
+                
+                if (!searchTerm) {
+                    itemDetails.style.display = "none";
+                    return;
+                }
+                
+                // Filter items based on search term, category, price and discount
+                let filteredItems = items.filter(item => {
+                    // Filter by search term
+                    if (!item.name.toLowerCase().includes(searchTerm)) {
+                        return false;
+                    }
+                    
+                    // Filter by category if selected
+                    const selectedCategory = categorySelect.value;
+                    if (selectedCategory && item.category !== selectedCategory) {
+                        return false;
+                    }
+                    
+                    // Filter by min price if provided
+                    const minPrice = parseInt(minPriceInput.value);
+                    if (!isNaN(minPrice) && item.price < minPrice) {
+                        return false;
+                    }
+                    
+                    // Filter by max price if provided
+                    const maxPrice = parseInt(maxPriceInput.value);
+                    if (!isNaN(maxPrice) && item.price > maxPrice) {
+                        return false;
+                    }
+                    
+                    // Filter by discount if provided
+                    const minDiscount = parseInt(discountInput.value);
+                    if (!isNaN(minDiscount) && item.discount < minDiscount) {
+                        return false;
+                    }
+                    
+                    return true;
+                });
+                
+                // Update tracked status for each filtered item
+                const trackedIds = new Set(trackedItems);
+                filteredItems.forEach(item => {
+                    item.tracked = trackedIds.has(item.id);
+                });
+                
+                // Limit results to top 10 for performance
+                filteredItems = filteredItems.slice(0, 10);
+                
+                if (filteredItems.length > 0) {
+                    renderItemSuggestions(filteredItems);
+                } else {
+                    itemDetails.style.display = "none";
+                }
+            }
+            
+            // Enable drag-to-scroll functionality
+            function enableDragToScroll(element) {
+                let isDown = false;
+                let startX, startY, scrollLeft, scrollTop;
+                
+                element.addEventListener('mousedown', (e) => {
+                    // Skip if clicking on a button or interactive element
+                    if (e.target.tagName === 'BUTTON' || e.target.closest('button') || 
+                        e.target.tagName === 'A' || e.target.closest('a') || 
+                        e.target.tagName === 'INPUT' || e.target.closest('input') ||
+                        e.target.tagName === 'LABEL' || e.target.closest('label') ||
+                        e.target.classList.contains('modal-tab') || 
+                        e.target.classList.contains('buy-sell-tab')) {
+                        return;
+                    }
+                    
+                    isDown = true;
+                    element.style.cursor = 'grabbing';
+                    startX = e.pageX - element.offsetLeft;
+                    startY = e.pageY - element.offsetTop;
+                    scrollLeft = element.scrollLeft;
+                    scrollTop = element.scrollTop;
+                });
+                
+                element.addEventListener('mouseleave', () => {
+                    isDown = false;
+                    element.style.cursor = 'default';
+                });
+                
+                element.addEventListener('mouseup', () => {
+                    isDown = false;
+                    element.style.cursor = 'default';
+                });
+                
+                element.addEventListener('mousemove', (e) => {
+                    if (!isDown) return;
+                    e.preventDefault();
+                    const x = e.pageX - element.offsetLeft;
+                    const y = e.pageY - element.offsetTop;
+                    const walkX = (x - startX) * 1.5; // Adjust scrolling speed
+                    const walkY = (y - startY) * 1.5;
+                    element.scrollLeft = scrollLeft - walkX;
+                    element.scrollTop = scrollTop - walkY;
+                });
+                
+                // Touch events for mobile
+                element.addEventListener('touchstart', (e) => {
+                    // Skip if touching a button or interactive element
+                    if (e.target.tagName === 'BUTTON' || e.target.closest('button') || 
+                        e.target.tagName === 'A' || e.target.closest('a') || 
+                        e.target.tagName === 'INPUT' || e.target.closest('input') ||
+                        e.target.tagName === 'LABEL' || e.target.closest('label') ||
+                        e.target.classList.contains('modal-tab') || 
+                        e.target.classList.contains('buy-sell-tab')) {
+                        return;
+                    }
+                    
+                    isDown = true;
+                    const touch = e.touches[0];
+                    startX = touch.pageX - element.offsetLeft;
+                    startY = touch.pageY - element.offsetTop;
+                    scrollLeft = element.scrollLeft;
+                    scrollTop = element.scrollTop;
+                }, { passive: false });
+                
+                element.addEventListener('touchend', () => {
+                    isDown = false;
+                });
+                
+                element.addEventListener('touchmove', (e) => {
+                    if (!isDown) return;
+                    const touch = e.touches[0];
+                    const x = touch.pageX - element.offsetLeft;
+                    const y = touch.pageY - element.offsetTop;
+                    const walkX = (x - startX) * 1.5;
+                    const walkY = (y - startY) * 1.5;
+                    element.scrollLeft = scrollLeft - walkX;
+                    element.scrollTop = scrollTop - walkY;
+                }, { passive: false });
+            }
+            
+            // Apply drag-to-scroll to scrollable containers
+            enableDragToScroll(document.getElementById('app-content'));
+            document.querySelectorAll('.modal-panel, .sales-table-container, .item-details, .user-list').forEach(container => {
+                enableDragToScroll(container);
+            });
+            
             const filterToggle = document.querySelector('.filter-toggle');
             const filterOptions = document.querySelector('.filter-options');
             const filterToggleText = filterToggle.querySelector('.filter-text');
@@ -1170,13 +1454,112 @@
             };
             
             let items = [
-                { id: "pistol", name: "Пистолет", category: "weapons", price: 60000, discount: 10, tracked: false, desiredPrice: 60000 },
-                { id: "armor", name: "Бронежилет", category: "suits", price: 120000, discount: 5, tracked: false, desiredPrice: 120000 },
-                { id: "rifle", name: "Автомат", category: "weapons", price: 80000, discount: 15, tracked: false, desiredPrice: 80000 },
-                { id: "art1", name: "Артефакт Око", category: "artifacts", price: 250000, discount: 0, tracked: false, desiredPrice: 250000 },
-                { id: "attach1", name: "Прицел ПСО", category: "attachments", price: 45000, discount: 20, tracked: false, desiredPrice: 45000 },
-                { id: "other1", name: "Аптечка науч.", category: "other", price: 5000, discount: 0, tracked: false, desiredPrice: 5000 },
-                { id: "adv_parts", name: "Продвинутые детали", category: "other", price: 35000, discount: 5, tracked: false, desiredPrice: 35000 },
+                // Оружие
+                { id: "aks_74", name: "АКС-74", category: "weapons", price: 85000, discount: 0, tracked: false, desiredPrice: 85000 },
+                { id: "ak_74", name: "АК-74", category: "weapons", price: 75000, discount: 0, tracked: false, desiredPrice: 75000 },
+                { id: "ak_74m", name: "АК-74М", category: "weapons", price: 95000, discount: 0, tracked: false, desiredPrice: 95000 },
+                { id: "abakan", name: "Абакан", category: "weapons", price: 120000, discount: 0, tracked: false, desiredPrice: 120000 },
+                { id: "val", name: "ВАЛ", category: "weapons", price: 150000, discount: 0, tracked: false, desiredPrice: 150000 },
+                { id: "vintorez", name: "Винторез", category: "weapons", price: 160000, discount: 0, tracked: false, desiredPrice: 160000 },
+                { id: "f2000", name: "F2000", category: "weapons", price: 200000, discount: 0, tracked: false, desiredPrice: 200000 },
+                { id: "lr_300", name: "ЛР-300", category: "weapons", price: 110000, discount: 0, tracked: false, desiredPrice: 110000 },
+                { id: "pm", name: "ПМ", category: "weapons", price: 30000, discount: 0, tracked: false, desiredPrice: 30000 },
+                { id: "fora_12", name: "Фора-12", category: "weapons", price: 70000, discount: 0, tracked: false, desiredPrice: 70000 },
+                { id: "toz_34", name: "ТОЗ-34", category: "weapons", price: 65000, discount: 0, tracked: false, desiredPrice: 65000 },
+                { id: "obrez", name: "Обрез", category: "weapons", price: 45000, discount: 0, tracked: false, desiredPrice: 45000 },
+                { id: "mp_133", name: "МП-133", category: "weapons", price: 75000, discount: 0, tracked: false, desiredPrice: 75000 },
+                { id: "saiga_12", name: "Сайга-12", category: "weapons", price: 95000, discount: 0, tracked: false, desiredPrice: 95000 },
+                { id: "spsa_14", name: "СПСА-14", category: "weapons", price: 115000, discount: 0, tracked: false, desiredPrice: 115000 },
+                { id: "svd", name: "СВД", category: "weapons", price: 180000, discount: 0, tracked: false, desiredPrice: 180000 },
+                { id: "rpk", name: "РПК", category: "weapons", price: 170000, discount: 0, tracked: false, desiredPrice: 170000 },
+                { id: "pkm", name: "ПКМ", category: "weapons", price: 200000, discount: 0, tracked: false, desiredPrice: 200000 },
+                { id: "groza", name: "Гроза", category: "weapons", price: 130000, discount: 0, tracked: false, desiredPrice: 130000 },
+                { id: "f_1", name: "Ф-1", category: "weapons", price: 25000, discount: 0, tracked: false, desiredPrice: 25000 },
+                { id: "rgd_5", name: "РГД-5", category: "weapons", price: 20000, discount: 0, tracked: false, desiredPrice: 20000 },
+                { id: "gm_94", name: "ГМ-94", category: "weapons", price: 160000, discount: 0, tracked: false, desiredPrice: 160000 },
+                { id: "rpg_7", name: "РПГ-7", category: "weapons", price: 250000, discount: 0, tracked: false, desiredPrice: 250000 },
+                
+                // Броня и снаряжение
+                { id: "modular_armor", name: "Модульная броня", category: "armor", price: 150000, discount: 0, tracked: false, desiredPrice: 150000 },
+                { id: "zarya", name: "Заря", category: "armor", price: 90000, discount: 0, tracked: false, desiredPrice: 90000 },
+                { id: "berill", name: "Берилл", category: "armor", price: 120000, discount: 0, tracked: false, desiredPrice: 120000 },
+                { id: "kora_25", name: "КОРА-25", category: "armor", price: 110000, discount: 0, tracked: false, desiredPrice: 110000 },
+                { id: "kora_42", name: "КОРА-42", category: "armor", price: 130000, discount: 0, tracked: false, desiredPrice: 130000 },
+                { id: "seva", name: "СЕВА", category: "armor", price: 160000, discount: 0, tracked: false, desiredPrice: 160000 },
+                { id: "kpk", name: "КПК", category: "armor", price: 40000, discount: 0, tracked: false, desiredPrice: 40000 },
+                { id: "detector", name: "Детектор", category: "armor", price: 50000, discount: 0, tracked: false, desiredPrice: 50000 },
+                { id: "binoculars", name: "Бинокль", category: "armor", price: 30000, discount: 0, tracked: false, desiredPrice: 30000 },
+                { id: "knife", name: "Нож", category: "armor", price: 15000, discount: 0, tracked: false, desiredPrice: 15000 },
+                { id: "gas_mask", name: "Противогаз", category: "armor", price: 35000, discount: 0, tracked: false, desiredPrice: 35000 },
+                { id: "respirator", name: "Респиратор", category: "armor", price: 25000, discount: 0, tracked: false, desiredPrice: 25000 },
+                { id: "backpack", name: "Рюкзак", category: "armor", price: 45000, discount: 0, tracked: false, desiredPrice: 45000 },
+                { id: "balaclava", name: "Балаклава", category: "armor", price: 10000, discount: 0, tracked: false, desiredPrice: 10000 },
+                { id: "helmet", name: "Шлем", category: "armor", price: 50000, discount: 0, tracked: false, desiredPrice: 50000 },
+                { id: "bodyarmor", name: "Бронежилет", category: "armor", price: 80000, discount: 0, tracked: false, desiredPrice: 80000 },
+                
+                // Артефакты
+                { id: "medusa", name: "Артефакт \"Медуза\"", category: "artifacts", price: 80000, discount: 0, tracked: false, desiredPrice: 80000 },
+                { id: "flash", name: "Артефакт \"Вспышка\"", category: "artifacts", price: 90000, discount: 0, tracked: false, desiredPrice: 90000 },
+                { id: "eye", name: "Артефакт \"Глаз\"", category: "artifacts", price: 100000, discount: 0, tracked: false, desiredPrice: 100000 },
+                { id: "dummy", name: "Артефакт \"Пустышка\"", category: "artifacts", price: 50000, discount: 0, tracked: false, desiredPrice: 50000 },
+                { id: "gravi", name: "Артефакт \"Грави\"", category: "artifacts", price: 120000, discount: 0, tracked: false, desiredPrice: 120000 },
+                { id: "goldfish", name: "Артефакт \"Золотая рыбка\"", category: "artifacts", price: 150000, discount: 0, tracked: false, desiredPrice: 150000 },
+                { id: "soul", name: "Артефакт \"Душа\"", category: "artifacts", price: 200000, discount: 0, tracked: false, desiredPrice: 200000 },
+                { id: "battery", name: "Артефакт \"Батарейка\"", category: "artifacts", price: 80000, discount: 0, tracked: false, desiredPrice: 80000 },
+                { id: "crystal", name: "Артефакт \"Кристалл\"", category: "artifacts", price: 110000, discount: 0, tracked: false, desiredPrice: 110000 },
+                { id: "moms_beads", name: "Артефакт \"Мамины бусы\"", category: "artifacts", price: 250000, discount: 0, tracked: false, desiredPrice: 250000 },
+                { id: "fireball", name: "Артефакт \"Огненный шар\"", category: "artifacts", price: 130000, discount: 0, tracked: false, desiredPrice: 130000 },
+                
+                // Амуниция и боеприпасы
+                { id: "ammo_545x39", name: "Патроны 5.45x39", category: "ammo", price: 15000, discount: 0, tracked: false, desiredPrice: 15000 },
+                { id: "ammo_556x45", name: "Патроны 5.56x45", category: "ammo", price: 18000, discount: 0, tracked: false, desiredPrice: 18000 },
+                { id: "ammo_762x39", name: "Патроны 7.62x39", category: "ammo", price: 20000, discount: 0, tracked: false, desiredPrice: 20000 },
+                { id: "ammo_762x54", name: "Патроны 7.62x54", category: "ammo", price: 25000, discount: 0, tracked: false, desiredPrice: 25000 },
+                { id: "ammo_9x18", name: "Патроны 9x18", category: "ammo", price: 8000, discount: 0, tracked: false, desiredPrice: 8000 },
+                { id: "ammo_9x19", name: "Патроны 9x19", category: "ammo", price: 10000, discount: 0, tracked: false, desiredPrice: 10000 },
+                { id: "ammo_9x39", name: "Патроны 9x39", category: "ammo", price: 22000, discount: 0, tracked: false, desiredPrice: 22000 },
+                { id: "ammo_12x70", name: "Патроны 12x70", category: "ammo", price: 12000, discount: 0, tracked: false, desiredPrice: 12000 },
+                
+                // Медикаменты
+                { id: "medkit", name: "Аптечка", category: "meds", price: 10000, discount: 0, tracked: false, desiredPrice: 10000 },
+                { id: "bandage", name: "Бинт", category: "meds", price: 5000, discount: 0, tracked: false, desiredPrice: 5000 },
+                { id: "antirad", name: "Антирад", category: "meds", price: 8000, discount: 0, tracked: false, desiredPrice: 8000 },
+                { id: "anabiotic", name: "Анабиотик", category: "meds", price: 15000, discount: 0, tracked: false, desiredPrice: 15000 },
+                { id: "stimulator", name: "Стимулятор", category: "meds", price: 12000, discount: 0, tracked: false, desiredPrice: 12000 },
+                { id: "energy_drink", name: "Энергетик", category: "meds", price: 6000, discount: 0, tracked: false, desiredPrice: 6000 },
+                
+                // Еда и напитки
+                { id: "canned_food", name: "Консервы", category: "food", price: 4000, discount: 0, tracked: false, desiredPrice: 4000 },
+                { id: "sausage", name: "Колбаса", category: "food", price: 3000, discount: 0, tracked: false, desiredPrice: 3000 },
+                { id: "bread", name: "Хлеб", category: "food", price: 2000, discount: 0, tracked: false, desiredPrice: 2000 },
+                { id: "mre", name: "Сухпаек", category: "food", price: 7000, discount: 0, tracked: false, desiredPrice: 7000 },
+                { id: "vodka", name: "Водка", category: "food", price: 5000, discount: 0, tracked: false, desiredPrice: 5000 },
+                { id: "water", name: "Вода", category: "food", price: 3500, discount: 0, tracked: false, desiredPrice: 3500 },
+                
+                // Компоненты и материалы
+                { id: "adv_parts", name: "Продвинутые запчасти", category: "components", price: 78000, discount: 0, tracked: false, desiredPrice: 78000 },
+                { id: "bolt", name: "Болт", category: "components", price: 1000, discount: 0, tracked: false, desiredPrice: 1000 },
+                { id: "nut", name: "Гайка", category: "components", price: 1000, discount: 0, tracked: false, desiredPrice: 1000 },
+                { id: "battery_item", name: "Батарейка", category: "components", price: 3000, discount: 0, tracked: false, desiredPrice: 3000 },
+                { id: "tape", name: "Изолента", category: "components", price: 2500, discount: 0, tracked: false, desiredPrice: 2500 },
+                { id: "wire", name: "Проволока", category: "components", price: 2000, discount: 0, tracked: false, desiredPrice: 2000 },
+                { id: "fabric", name: "Материя", category: "components", price: 3500, discount: 0, tracked: false, desiredPrice: 3500 },
+                { id: "leather", name: "Кожа", category: "components", price: 4500, discount: 0, tracked: false, desiredPrice: 4500 },
+                { id: "spring", name: "Пружина", category: "components", price: 2800, discount: 0, tracked: false, desiredPrice: 2800 },
+                { id: "chip", name: "Микросхема", category: "components", price: 6000, discount: 0, tracked: false, desiredPrice: 6000 },
+                { id: "guitar", name: "Гитара", category: "components", price: 9000, discount: 0, tracked: false, desiredPrice: 9000 },
+                { id: "weapon_parts", name: "Детали оружия", category: "components", price: 12000, discount: 0, tracked: false, desiredPrice: 12000 },
+                { id: "optics", name: "Оптика", category: "components", price: 15000, discount: 0, tracked: false, desiredPrice: 15000 },
+                { id: "gun_oil", name: "Оружейная смазка", category: "components", price: 5000, discount: 0, tracked: false, desiredPrice: 5000 },
+                { id: "tools", name: "Инструменты", category: "components", price: 8000, discount: 0, tracked: false, desiredPrice: 8000 },
+                { id: "glue", name: "Клей", category: "components", price: 3000, discount: 0, tracked: false, desiredPrice: 3000 },
+                
+                // Квестовые предметы
+                { id: "flash_drive", name: "Флешка", category: "quest", price: 30000, discount: 0, tracked: false, desiredPrice: 30000 },
+                { id: "documents", name: "Документы", category: "quest", price: 25000, discount: 0, tracked: false, desiredPrice: 25000 },
+                { id: "key", name: "Ключ", category: "quest", price: 20000, discount: 0, tracked: false, desiredPrice: 20000 },
+                { id: "access_card", name: "Карта доступа", category: "quest", price: 35000, discount: 0, tracked: false, desiredPrice: 35000 },
+                { id: "pda", name: "ПДА", category: "quest", price: 40000, discount: 0, tracked: false, desiredPrice: 40000 }
             ];
 
             let trackedItems = [];
@@ -1304,28 +1687,6 @@
                             showItemDetails(item);
                         });
                     });
-                } else {
-                    itemDetails.style.display = "none";
-                }
-            }
-
-            function filterItems() {
-                const searchTerm = searchInput.value.toLowerCase();
-                
-                if (!searchTerm) {
-                    itemDetails.style.display = "none";
-                    return;
-                }
-                
-                // Find only "Продвинутые детали" item
-                const advPartsItem = items.find(item => item.id === "adv_parts");
-                
-                if (advPartsItem) {
-                    const trackedIds = new Set(trackedItems);
-                    advPartsItem.tracked = trackedIds.has(advPartsItem.id);
-                    
-                    // Only render the "Продвинутые детали" item
-                    renderItemSuggestions([advPartsItem]);
                 } else {
                     itemDetails.style.display = "none";
                 }
@@ -1682,6 +2043,146 @@
                 }
             });
 
+            // Handle compensation days/hours functionality
+            const compensationDaysInput = document.getElementById('compensation-days');
+            const compensationHoursInput = document.getElementById('compensation-hours');
+            const compensationMessage = document.getElementById('compensation-message');
+            const compensationButton = document.getElementById('compensation-button');
+            
+            function updateCompensationMessage() {
+                const days = parseInt(compensationDaysInput.value) || 0;
+                const hours = parseInt(compensationHoursInput.value) || 0;
+                
+                // Skip if both are zero
+                if (days === 0 && hours === 0) {
+                    compensationMessage.textContent = 'Укажите время для изменения срока подписки';
+                    compensationButton.disabled = true;
+                    return;
+                }
+                
+                compensationButton.disabled = false;
+                
+                // Build message based on values
+                let action = '';
+                if ((days > 0 && hours >= 0) || (days === 0 && hours > 0)) {
+                    action = 'Добавить';
+                } else if ((days < 0 && hours <= 0) || (days === 0 && hours < 0)) {
+                    action = 'Убрать';
+                } else {
+                    // Mixed case (e.g., -1 day, +2 hours)
+                    compensationMessage.textContent = `Смешанное изменение: ${Math.abs(days)} дн. ${days > 0 ? 'добавить' : 'убрать'}, ${Math.abs(hours)} ч. ${hours > 0 ? 'добавить' : 'убрать'}`;
+                    return;
+                }
+                
+                let timeText = [];
+                if (Math.abs(days) > 0) {
+                    const daysText = getDayText(Math.abs(days));
+                    timeText.push(`${Math.abs(days)} ${daysText}`);
+                }
+                
+                if (Math.abs(hours) > 0) {
+                    const hoursText = getHourText(Math.abs(hours));
+                    timeText.push(`${Math.abs(hours)} ${hoursText}`);
+                }
+                
+                compensationMessage.textContent = `${action} всем активным пользователям ${timeText.join(' и ')}`;
+            }
+            
+            function getDayText(days) {
+                if (days % 10 === 1 && days % 100 !== 11) {
+                    return 'день';
+                } else if ([2, 3, 4].includes(days % 10) && ![12, 13, 14].includes(days % 100)) {
+                    return 'дня';
+                } else {
+                    return 'дней';
+                }
+            }
+            
+            function getHourText(hours) {
+                if (hours % 10 === 1 && hours % 100 !== 11) {
+                    return 'час';
+                } else if ([2, 3, 4].includes(hours % 10) && ![12, 13, 14].includes(hours % 100)) {
+                    return 'часа';
+                } else {
+                    return 'часов';
+                }
+            }
+            
+            function showConfirmationModal(message, onConfirm) {
+                // Get existing modal
+                const confirmationModal = document.getElementById('confirmation-modal');
+                const messageElement = confirmationModal.querySelector('.confirmation-message');
+                const yesButton = confirmationModal.querySelector('.confirm-yes');
+                const noButton = confirmationModal.querySelector('.confirm-no');
+                
+                // Update message
+                messageElement.textContent = message;
+                
+                // Setup event handlers (using once to auto-remove)
+                noButton.onclick = () => {
+                    confirmationModal.style.display = 'none';
+                };
+                
+                yesButton.onclick = () => {
+                    onConfirm();
+                    confirmationModal.style.display = 'none';
+                };
+                
+                // Show modal
+                confirmationModal.style.display = 'flex';
+            }
+            
+            compensationDaysInput.addEventListener('input', updateCompensationMessage);
+            compensationHoursInput.addEventListener('input', updateCompensationMessage);
+            
+            compensationButton.addEventListener('click', () => {
+                const days = parseInt(compensationDaysInput.value) || 0;
+                const hours = parseInt(compensationHoursInput.value) || 0;
+                
+                if (days === 0 && hours === 0) {
+                    return;
+                }
+                
+                // Build message for confirmation
+                const totalMilliseconds = (days * 24 * 60 * 60 * 1000) + (hours * 60 * 60 * 1000);
+                const action = totalMilliseconds > 0 ? 'добавить' : 'убрать';
+                
+                let timeText = [];
+                if (Math.abs(days) > 0) {
+                    const daysText = getDayText(Math.abs(days));
+                    timeText.push(`${Math.abs(days)} ${daysText}`);
+                }
+                
+                if (Math.abs(hours) > 0) {
+                    const hoursText = getHourText(Math.abs(hours));
+                    timeText.push(`${Math.abs(hours)} ${hoursText}`);
+                }
+                
+                const confirmMessage = `Вы действительно хотите ${action} ${timeText.join(' и ')} всем активным пользователям?`;
+                
+                showConfirmationModal(confirmMessage, () => {
+                    // Process compensation
+                    adminData.users.forEach(user => {
+                        if (user.enabled) {
+                            // Parse current expiration date
+                            const currentExpiry = new Date(user.expires);
+                            
+                            // Add or subtract time
+                            currentExpiry.setTime(currentExpiry.getTime() + totalMilliseconds);
+                            
+                            // Update user
+                            user.expires = currentExpiry.toISOString().split('T')[0];
+                        }
+                    });
+                    
+                    // Refresh display
+                    renderAdminUsers();
+                    
+                    // Show notification
+                    showNotification(`Время подписки изменено для всех активных пользователей!`);
+                });
+            });
+
             function loadAdminData() {
                 priceNormalInput.value = adminData.prices.normal;
                 priceAdvancedInput.value = adminData.prices.advanced;
@@ -1720,6 +2221,9 @@
                 const modalTitle = modal.querySelector('h2');
                 modalTitle.textContent = item.name;
                 
+                // Update sales timestamps with current Moscow time
+                updateSalesTimestamps();
+                
                 // Show modal
                 modal.style.display = 'block';
                 
@@ -1727,10 +2231,54 @@
                 document.body.style.overflow = 'hidden';
             }
             
+            // Function to update sales timestamps based on current Moscow time
+            function updateSalesTimestamps() {
+                // Get current date and time in Moscow timezone (UTC+3)
+                const now = new Date();
+                // Adjust to Moscow time (UTC+3)
+                const mskTime = new Date(now.getTime() + (3 * 60 + now.getTimezoneOffset()) * 60000);
+                
+                // Get all timestamp cells in the sales table
+                const salesTable = document.querySelector('#panel-history .sales-table tbody');
+                if (!salesTable) return;
+                
+                const rows = salesTable.querySelectorAll('tr');
+                
+                // Update each row with decreasing timestamps (1 minute apart)
+                rows.forEach((row, index) => {
+                    const timeCell = row.querySelector('td:first-child');
+                    if (timeCell) {
+                        // Clone the current MSK time and subtract 'index' minutes
+                        const saleTime = new Date(mskTime);
+                        saleTime.setMinutes(mskTime.getMinutes() - index);
+                        
+                        // Format the date: DD.MM.YYYY HH:MM
+                        const day = String(saleTime.getDate()).padStart(2, '0');
+                        const month = String(saleTime.getMonth() + 1).padStart(2, '0');
+                        const year = saleTime.getFullYear();
+                        const hours = String(saleTime.getHours()).padStart(2, '0');
+                        const minutes = String(saleTime.getMinutes()).padStart(2, '0');
+                        
+                        timeCell.textContent = `${day}.${month}.${year} ${hours}:${minutes}`;
+                    }
+                });
+            }
+            
             document.getElementById('close-modal').addEventListener('click', function() {
                 const modal = document.getElementById('item-detail-modal');
                 modal.style.display = 'none';
                 document.body.style.overflow = '';
+                
+                // Restore search results if they were visible
+                const searchInput = document.getElementById('search-item');
+                if (searchInput.value.trim() !== '') {
+                    const itemDetails = document.querySelector('#filtering .item-details');
+                    if (itemDetails) {
+                        itemDetails.style.display = 'block';
+                    }
+                    // Re-run search to ensure results are shown
+                    filterItems();
+                }
             });
             
             // Close modal when clicking outside
@@ -1739,6 +2287,17 @@
                 if (event.target === modal) {
                     modal.style.display = 'none';
                     document.body.style.overflow = '';
+                    
+                    // Restore search results if they were visible
+                    const searchInput = document.getElementById('search-item');
+                    if (searchInput.value.trim() !== '') {
+                        const itemDetails = document.querySelector('#filtering .item-details');
+                        if (itemDetails) {
+                            itemDetails.style.display = 'block';
+                        }
+                        // Re-run search to ensure results are shown
+                        filterItems();
+                    }
                 }
             });
             
